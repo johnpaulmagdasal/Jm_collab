@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java OOP & UML Exam Simulation (Part A, B, & C)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .shading-circle {
+            transition: all 0.2s ease;
+        }
+        .shading-circle.selected {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-amber-400"></i> 
+                </h1>
+                <p class="text-xs text-indigo-200 mt-1">Object-Oriented Programming & UML Design Comprehensive Test</p>
+            </div>
+            <div class="mt-3 md:mt-0 flex items-center gap-4">
+                <div class="bg-indigo-800 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 border border-indigo-700">
+                    <i class="fa-regular fa-clock text-amber-400"></i>
+                    <span id="timer">60:00</span>
+                </div>
+                <button onclick="submitExam()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2 rounded-lg text-sm font-medium transition shadow-sm">
+                    Submit Exam
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full grid grid-cols-1 lg:grid-cols-4 gap-8">
+        
+        <!-- Left / Center: Exam Questions Content -->
+        <div class="lg:col-span-3 space-y-8">
+
+            <!-- Intro Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <h2 class="text-lg font-bold text-slate-900">Part A, Part B, & Part C Interactive Test Simulation</h2>
+                <p class="text-sm text-slate-600 mt-1">
+                    Answer all items accurately. For multiple-choice questions with multiple valid answers, select all correct shading options. For Part B & C, write or structure your responses carefully.
+                </p>
+                <div class="flex gap-2 mt-4">
+                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded">Part A: Multiple Choice (1–44)</span>
+                    <span class="bg-purple-100 text-purple-800 text-xs font-semibold px-2.5 py-1 rounded">Part B: Essay</span>
+                    <span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded">Part C: Class Diagrams</span>
+                </div>
+            </div>
+
+            <!-- PART A CONTAINER -->
+            <div id="part-a-container" class="space-y-6">
+                <!-- Dynamically populated Part A questions -->
+            </div>
+
+            <!-- PART B ESSAY CONTAINER -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="border-b pb-3">
+                    <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-pen-nib text-indigo-600"></i> Part B — Essay</h3>
+                    <p class="text-xs text-slate-500">Instructions: Write an essay answer for each question (minimum 12 words per item).</p>
+                </div>
+                <div id="essay-container" class="space-y-6">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- PART C CLASS DIAGRAMS CONTAINER -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="border-b pb-3">
+                    <h3 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-sitemap text-indigo-600"></i> Part C — Class Diagram & Design Modeling</h3>
+                    <p class="text-xs text-slate-500">Examine the modeling requirements and build or review your architectural solution.</p>
+                </div>
+                <div id="diagram-container" class="space-y-6">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Shading Sheet & Quick Navigator -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 sticky top-24">
+                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider border-b pb-3 flex items-center justify-between">
+                    <span>GradeChum Shading Sheet</span>
+                    <span id="answered-count" class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium">0 / 44 Answered</span>
+                </h3>
+                
+                <div class="mt-4 max-h-[60vh] overflow-y-auto pr-1 grid grid-cols-4 gap-2 text-center" id="shading-navigator">
+                    <!-- Grid numbers generated by JS -->
+                </div>
+
+                <div class="mt-6 pt-4 border-t">
+                    <button onclick="submitExam()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2.5 rounded-lg text-sm font-medium transition shadow-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> Finalize & Grade Exam
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Results Modal -->
+    <div id="results-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-square-poll-vertical text-indigo-600"></i> Exam Simulation Report
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="score-summary" class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 text-center">
+                <!-- Score breakdown -->
+            </div>
+            <div id="detailed-feedback" class="space-y-4 text-sm">
+                <!-- Feedback per question -->
+            </div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeModal()" class="bg-slate-800 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-slate-700 transition">Close Review</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Engine -->
+    <script>
+        // Exam Data Store
+        const partAQuestions = [
+            {
+                id: 1, group: "Questions 1–5 (Shared choices: a. fields, b. interface methods, c. class methods, d. classes, e. none of the above)",
+                question: "Can be declared as static.",
+                choices: [
+                    { key: 'a', text: 'fields' },
+                    { key: 'b', text: 'interface methods' },
+                    { key: 'c', text: 'class methods' },
+                    { key: 'd', text: 'classes' }
+                ],
+                correct: ['a', 'c', 'd'], // Static fields, static methods, nested static classes
+                type: 'multiple'
+            },
+            {
+                id: 2, group: "Questions 1–5",
+                question: "Can be declared as final.",
+                choices: [
+                    { key: 'a', text: 'fields' },
+                    { key: 'b', text: 'interface methods' },
+                    { key: 'c', text: 'class methods' },
+                    { key: 'd', text: 'classes' }
+                ],
+                correct: ['a', 'b', 'c', 'd'], // Final fields, final interface methods (default/static), final methods, final classes
+                type: 'multiple'
+            },
+            {
+                id: 3, group: "Questions 1–5",
+                question: "Can be declared as default.",
+                choices: [
+                    { key: 'a', text: 'fields' },
+                    { key: 'b', text: 'interface methods' },
+                    { key: 'c', text: 'class methods' },
+                    { key: 'd', text: 'classes' }
+                ],
+                correct: ['b'], // default methods in interfaces
+                type: 'multiple'
+            },
+            {
+                id: 4, group: "Questions 1–5",
+                question: "Can be declared as abstract.",
+                choices: [
+                    { key: 'a', text: 'fields' },
+                    { key: 'b', text: 'interface methods' },
+                    { key: 'c', text: 'class methods' },
+                    { key: 'd', text: 'classes' }
+                ],
+                correct: ['b', 'd'], // abstract methods in interfaces/abstract classes, and abstract classes
+                type: 'multiple'
+            },
+            {
+                id: 5, group: "Questions 1–5",
+                question: "Can be set as package-private.",
+                choices: [
+                    { key: 'a', text: 'fields' },
+                    { key: 'b', text: 'interface methods' },
+                    { key: 'c', text: 'class methods' },
+                    { key: 'd', text: 'classes' }
+                ],
+                correct: ['a', 'c', 'd'], // Package-private fields, methods, and top-level/nested classes. Interface methods are implicitly public.
+                type: 'multiple'
+            },
+            {
+                id: 6, group: "Question 6",
+                question: "Which of the following statements are true regarding typecasting in Java? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'You can do implicit casting from double to int.' },
+                    { key: 'b', text: 'You can do implicit casting from int to double.' },
+                    { key: 'c', text: 'If a Cat is an Animal, you can do Animal a = new Cat();.' },
+                    { key: 'd', text: 'If a Cat is an Animal, you can do Cat a = new Animal();.' }
+                ],
+                correct: ['b', 'c'],
+                type: 'multiple'
+            },
+            {
+                id: 7, group: "Question 7",
+                question: "Which of the following are true regarding abstract classes? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'You can make the class abstract without having abstract methods.' },
+                    { key: 'b', text: 'You can have abstract methods without being in an abstract class.' },
+                    { key: 'c', text: 'You can choose NOT to implement abstract methods of its parent class provided that this class is also abstract.' },
+                    { key: 'd', text: 'You can use abstract class as reference variables.' }
+                ],
+                correct: ['a', 'c', 'd'],
+                type: 'multiple'
+            },
+            {
+                id: 8, group: "Question 8",
+                question: "Which of the following are true about overriding methods? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'If the method of the parent class is protected, you may choose to set the overridden method as public.' },
+                    { key: 'b', text: 'If a Cat is an Animal, when the method in the Animal class returns an Animal, you may change the return type of the overridden method to Cat in the Cat class.' },
+                    { key: 'c', text: 'You can override a private method.' },
+                    { key: 'd', text: 'If a Cat is an Animal, when the method in the Animal class accepts an Animal as a parameter, you may change the type of the parameter of the overridden method to Cat in the Cat class.' }
+                ],
+                correct: ['a', 'b'], // Covariant return types are allowed; widening parameter is overloading, not overriding; private methods cannot be overridden.
+                type: 'multiple'
+            },
+            {
+                id: 9, group: "Question 9",
+                question: "Which of the following are true about method overloading? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'You can perform method overloading for constructors.' },
+                    { key: 'b', text: 'You can perform method overloading for methods that have two integers as parameters.' },
+                    { key: 'c', text: 'You can perform method overloading for methods that have a String and an integer as parameters.' },
+                    { key: 'd', text: 'The methods involved in method overloading may differ in their number of parameters.' }
+                ],
+                correct: ['a', 'b', 'c', 'd'],
+                type: 'multiple'
+            },
+            {
+                id: 10, group: "Question 10",
+                question: "Which of the following are true about inheritance? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'You can have fields of the same name that are already declared in the superclass (shadowing).' },
+                    { key: 'b', text: 'You can inherit multiple classes.' },
+                    { key: 'c', text: 'You can inherit multiple interfaces.' },
+                    { key: 'd', text: 'The super keyword only works for accessing the direct parent\'s fields and methods; therefore, you lose access to the grandparent\'s elements.' }
+                ],
+                correct: ['a', 'c'], // Java supports single class inheritance and multiple interface implementation. super refers to immediate parent.
+                type: 'multiple'
+            },
+            {
+                id: 11, group: "Question 11",
+                question: "Which of the following are true about association? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'All aggregations are associations.' },
+                    { key: 'b', text: 'All compositions are aggregations.' },
+                    { key: 'c', text: 'All associations are generalizations.' },
+                    { key: 'd', text: 'All aggregations are compositions.' }
+                ],
+                correct: ['a', 'b'],
+                type: 'multiple'
+            },
+            {
+                id: 12, group: "Question 12",
+                question: "Which of the following are true about multiplicity of associations? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'Associations can have many-to-many relationships.' },
+                    { key: 'b', text: 'Aggregations can have many-to-many relationships.' },
+                    { key: 'c', text: 'Compositions can have many-to-many relationships.' },
+                    { key: 'd', text: 'Associations can have one-to-one relationships.' }
+                ],
+                correct: ['a', 'b', 'd'], // Compositions are strictly part-whole with strict lifecycle dependency (usually 1-to-many or 1-to-1, not many-to-many shared).
+                type: 'multiple'
+            },
+            {
+                id: 13, group: "Question 13",
+                question: "Which of the following are true about class diagrams? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'In the relationship between a Cat and Animal, a solid line with the triangle arrowhead is drawn with the arrowhead pointing to the Cat.' },
+                    { key: 'b', text: 'In the relationship between a Cow and a Farm, an arrowhead of an empty rhombus on the side of the Cow is drawn.' },
+                    { key: 'c', text: 'In the relationship between a Student and Teacher, an arrowhead of a filled rhombus on the side of the Teacher is drawn.' },
+                    { key: 'd', text: 'In the relationship between a class and an interface, a solid line and a triangle arrowhead pointing to the interface is drawn.' }
+                ],
+                correct: ['e'], // None of the above are standard: generalization points from subclass (Cat) to superclass (Animal); aggregation has empty rhombus on container side; composition has filled rhombus on container side; interface realization uses dashed line with hollow triangle.
+                type: 'multiple'
+            },
+            {
+                id: 14, group: "Question 14",
+                question: "Which of the following are true about the Comparable interface? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'Its method has only one parameter.' },
+                    { key: 'b', text: 'It is used as basis for Collections.sort(list).' },
+                    { key: 'c', text: 'It should be implemented in the same class to which it compares.' },
+                    { key: 'd', text: 'Multiple Comparable classes can be created for a single class.' }
+                ],
+                correct: ['a', 'b', 'c'],
+                type: 'multiple'
+            },
+            {
+                id: 15, group: "Questions 15–21",
+                question: "Which among the choices is the best choice when sorting double type variables o1 and o2 in ascending order?",
+                choices: [
+                    { key: 'a', text: 'o1.compare(o2)' },
+                    { key: 'b', text: 'o1.compareTo(o2)' },
+                    { key: 'c', text: 'o1 - o2' },
+                    { key: 'd', text: 'Double.compare(o1, o2)' },
+                    { key: 'e', text: 'Double.compareTo(o1, o2)' }
+                ],
+                correct: ['d'],
+                type: 'single'
+            },
+            {
+                id: 16, group: "Questions 15–21",
+                question: "Which of the following are true about interfaces? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'It could have instance variables.' },
+                    { key: 'b', text: 'It can inherit other interfaces using the implements keyword.' },
+                    { key: 'c', text: 'Its methods could already be implemented (default/static methods).' },
+                    { key: 'd', text: 'It can inherit classes using the extends keyword.' }
+                ],
+                correct: ['c'],
+                type: 'multiple'
+            },
+            {
+                id: 17, group: "Questions 15–21",
+                question: "Which of the following are true about getters and setters? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'Setters have no parameters.' },
+                    { key: 'b', text: 'Getters have void as its return type.' },
+                    { key: 'c', text: 'Final variables can have getters.' },
+                    { key: 'd', text: 'Final variables can have setters.' }
+                ],
+                correct: ['c'],
+                type: 'multiple'
+            },
+            {
+                id: 18, group: "Questions 15–21",
+                question: "Which of the following are true about constructors? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'All classes have default constructors that can be used if there is no explicit constructor defined.' },
+                    { key: 'b', text: 'The default constructor can still be used when the class has already defined other constructors with parameters.' },
+                    { key: 'c', text: 'The call to the super constructor must be the first line in every constructor that inherits a class with constructors.' },
+                    { key: 'd', text: 'All constructors must have set all the class\'s final variables, otherwise an error occurs.' }
+                ],
+                correct: ['a', 'c', 'd'],
+                type: 'multiple'
+            },
+            {
+                id: 19, group: "Questions 15–21",
+                question: "Which of the following are true about access modifiers? Choose all that apply.",
+                choices: [
+                    { key: 'a', text: 'The default access level of class elements is package-private.' },
+                    { key: 'b', text: 'The protected access level modifier limits the access to only subclasses of the class.' },
+                    { key: 'c', text: 'The private access level modifier limits the access to only within the class.' },
+                    { key: 'd', text: 'The public access level modifier does not limit access, i.e., any class can access it.' }
+                ],
+                correct: ['a', 'c', 'd'], // Protected allows access within package AND subclasses outside package.
+                type: 'multiple'
+            },
+            {
+                id: 20, group: "Questions 15–21",
+                question: "Choose all the modifiers that are implicit for interface methods.",
+                choices: [
+                    { key: 'a', text: 'default' },
+                    { key: 'b', text: 'public' },
+                    { key: 'c', text: 'final' },
+                    { key: 'd', text: 'static' },
+                    { key: 'e', text: 'abstract' }
+                ],
+                correct: ['b', 'e'], // Interface methods are implicitly public and abstract (unless default or static).
+                type: 'multiple'
+            },
+            {
+                id: 21, group: "Questions 15–21",
+                question: "Using the same choices above, choose those that are implicit for interface variables.",
+                choices: [
+                    { key: 'a', text: 'default' },
+                    { key: 'b', text: 'public' },
+                    { key: 'c', text: 'final' },
+                    { key: 'd', text: 'static' },
+                    { key: 'e', text: 'abstract' }
+                ],
+                correct: ['b', 'c', 'd'], // Interface fields are implicitly public, static, and final.
+                type: 'multiple'
+            },
+            {
+                id: 22, group: "Questions 22–23",
+                question: "How do you call the default method foo() from an inherited interface Bar?",
+                choices: [
+                    { key: 'a', text: 'super.foo()' },
+                    { key: 'b', text: 'Bar.super.foo()' },
+                    { key: 'c', text: 'super.Bar.foo()' },
+                    { key: 'd', text: 'Bar.foo()' },
+                    { key: 'e', text: '(none, as it cannot be accessed directly)' }
+                ],
+                correct: ['b'],
+                type: 'single'
+            },
+            {
+                id: 23, group: "Questions 22–23",
+                question: "Using the same choices above, how do you call the abstract method foo() from an inherited interface Bar?",
+                choices: [
+                    { key: 'a', text: 'super.foo()' },
+                    { key: 'b', text: 'Bar.super.foo()' },
+                    { key: 'c', text: 'super.Bar.foo()' },
+                    { key: 'd', text: 'Bar.foo()' },
+                    { key: 'e', text: '(none, as it cannot be accessed directly - abstract methods have no body)' }
+                ],
+                correct: ['e'],
+                type: 'single'
+            },
+            {
+                id: 24, group: "Questions 24–29 (Choices: a. Non-Abstract Classes, b. Abstract Classes, c. Interfaces)",
+                question: "Can be instantiated.",
+                choices: [
+                    { key: 'a', text: 'Non-Abstract Classes' },
+                    { key: 'b', text: 'Abstract Classes' },
+                    { key: 'c', text: 'Interfaces' }
+                ],
+                correct: ['a'],
+                type: 'multiple'
+            },
+            {
+                id: 25, group: "Questions 24–29",
+                question: "Can have abstract methods.",
+                choices: [
+                    { key: 'a', text: 'Non-Abstract Classes' },
+                    { key: 'b', text: 'Abstract Classes' },
+                    { key: 'c', text: 'Interfaces' }
+                ],
+                correct: ['b', 'c'],
+                type: 'multiple'
+            },
+            {
+                id: 26, group: "Questions 24–29",
+                question: "Can have final variables.",
+                choices: [
+                    { key: 'a', text: 'Non-Abstract Classes' },
+                    { key: 'b', text: 'Abstract Classes' },
+                    { key: 'c', text: 'Interfaces' }
+                ],
+                correct: ['a', 'b', 'c'],
+                type: 'multiple'
+            },
+            {
+                id: 27, group: "Questions 24–29",
+                question: "Can have implemented methods.",
+                choices: [
+                    { key: 'a', text: 'Non-Abstract Classes' },
+                    { key: 'b', text: 'Abstract Classes' },
+                    { key: 'c', text: 'Interfaces' }
+                ],
+                correct: ['a', 'b', 'c'], // Interfaces can have default and static methods.
+                type: 'multiple'
+            },
+            {
+                id: 28, group: "Questions 24–29",
+                question: "Can have instance variables.",
+                choices: [
+                    { key: 'a', text: 'Non-Abstract Classes' },
+                    { key: 'b', text: 'Abstract Classes' },
+                    { key: 'c', text: 'Interfaces' }
+                ],
+                correct: ['a', 'b'], // Interface variables are static and final, not instance variables.
+                type: 'multiple'
+            },
+            {
+                id: 29, group: "Questions 24–29",
+                question: "A single class can inherit / implement multiple of these.",
+                choices: [
+                    { key: 'a', text: 'Non-Abstract Classes' },
+                    { key: 'b', text: 'Abstract Classes' },
+                    { key: 'c', text: 'Interfaces' }
+                ],
+                correct: ['c'], // Multiple inheritance of interfaces.
+                type: 'multiple'
+            },
+            {
+                id: 30, group: "Questions 30–45 (Choices: a. Inheritance, b. Polymorphism, c. Encapsulation, d. Abstraction)",
+                question: "The concept of getters and setters are mainly attributed to this principle.",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['c'], type: 'single'
+            },
+            {
+                id: 31, group: "Questions 30–45",
+                question: "What is the principle that makes us confident that all shapes will have an area and perimeter despite having different implementations for it?",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['d'], type: 'single'
+            },
+            {
+                id: 32, group: "Questions 30–45",
+                question: "What is the principle that makes it possible for us to use the elements of the parent or base class?",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['a'], type: 'single'
+            },
+            {
+                id: 33, group: "Questions 30–45",
+                question: "What is the principle where we can group all kinds of Plants like Peashooter and Sun-shroom into one single list?",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['b'], type: 'single'
+            },
+            {
+                id: 34, group: "Questions 30–45",
+                question: "What is the principle where we don't let other classes know how we implement ourselves so that they don't make a mess out of the class's elements?",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['c'], type: 'single'
+            },
+            {
+                id: 35, group: "Questions 30–45",
+                question: "A fundamental principle wherein it groups together attributes and functions into a single unit.",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['c'], type: 'single'
+            },
+            {
+                id: 36, group: "Questions 30–45",
+                question: "The purpose of this principle is to reuse code.",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['a'], type: 'single'
+            },
+            {
+                id: 37, group: "Questions 30–45",
+                question: "This exhibits the ability of objects of different classes to respond to the same method call but may have different implementations.",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['b'], type: 'single'
+            },
+            {
+                id: 38, group: "Questions 30–45",
+                question: "Because of this principle, calculations for area and perimeter do not require parameters in their methods (as state is encapsulated within the object).",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['c'], type: 'single'
+            },
+            {
+                id: 39, group: "Questions 30–45",
+                question: "This principle allows us to establish a hierarchy of classes.",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['a'], type: 'single'
+            },
+            {
+                id: 40, group: "Questions 30–45",
+                question: "This principle simplifies complex systems by providing a high-level view of the system.",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['d'], type: 'single'
+            },
+            {
+                id: 41, group: "Questions 30–45",
+                question: "This principle allows dynamic method dispatch, which means that the appropriate method to execute is determined at runtime based on the actual type of the object.",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['b'], type: 'single'
+            },
+            {
+                id: 42, group: "Questions 30–45",
+                question: "This principle involves defining essential characteristics and behaviors while hiding unnecessary implementation details.",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['d'], type: 'single'
+            },
+            {
+                id: 43, group: "Questions 30–45",
+                question: "What principle is used in typecasting a general class into its specific subclass?",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['b'], type: 'single'
+            },
+            {
+                id: 44, group: "Questions 30–45",
+                question: "What is the principle that makes us confident that all animals can perform makeSound() when we only create the method in the Animal class by only declaring it?",
+                choices: [{ key: 'a', text: 'Inheritance' }, { key: 'b', text: 'Polymorphism' }, { key: 'c', text: 'Encapsulation' }, { key: 'd', text: 'Abstraction' }],
+                correct: ['d'], type: 'single'
+            }
+        ];
+
+        const essayQuestions = [
+            { id: 1, prompt: "What is constructor chaining and what are its benefits?" },
+            { id: 2, prompt: "What are the main differences of Comparable and Comparator interfaces, and when are they typically used?" },
+            { id: 3, prompt: "When do we use abstract classes versus interfaces and when do we use one instead of the other?" },
+            { id: 4, prompt: "Describe where the four OOP principles were used in the Shapes activity, each with at least one sentence." }
+        ];
+
+        const diagramPrompts = [
+            { title: "Question 1 — CIT University", desc: "Design a class diagram with Teacher, Student, Course (CCS & CEA), associations with multiplicity, Lab room software setters, and student management methods." },
+            { title: "Question 2 — Plants vs. Zombies", desc: "Implement interfaces (SunProducer, Attacker, InstantKiller, PlantUpgrade, Upgradable) and class hierarchies (Plant, Mushroom, subclasses like SunShroom, DoomShroom, Squash, Jalapeno, etc.)." }
+        ];
+
+        // User answers state
+        const userAnswers = {};
+
+        // Initialize App
+        function initExam() {
+            renderPartA();
+            renderNavigator();
+            renderEssay();
+            renderDiagrams();
+            startTimer(60 * 60); // 60 minutes
+        }
+
+        function renderPartA() {
+            const container = document.getElementById('part-a-container');
+            let html = '';
+            let currentGroup = '';
+
+            partAQuestions.forEach((q) => {
+                if (q.group !== currentGroup) {
+                    currentGroup = q.group;
+                    html += `<div class="bg-indigo-50/60 border-l-4 border-indigo-600 p-3 text-xs font-semibold text-indigo-900 rounded-r-lg mt-4 mb-2">${currentGroup}</div>`;
+                }
+
+                html += `
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-3">
+                        <div class="flex items-start justify-between">
+                            <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">Item ${q.id}</span>
+                            <span class="text-xs text-indigo-600 font-medium">${q.type === 'multiple' ? 'Choose all that apply' : 'Choose only one'}</span>
+                        </div>
+                        <p class="text-sm font-medium text-slate-900">${q.question}</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                `;
+
+                q.choices.forEach(c => {
+                    html += `
+                        <label onclick="handleSelect(${q.id}, '${c.key}', '${q.type}')" id="label-${q.id}-${c.key}" class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer transition text-sm">
+                            <div id="circle-${q.id}-${c.key}" class="shading-circle w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center font-semibold text-xs text-slate-600">
+                                ${c.key.toUpperCase()}
+                            </div>
+                            <span class="text-slate-700">${c.text}</span>
+                        </label>
+                    `;
+                });
+
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderNavigator() {
+            const nav = document.getElementById('shading-navigator');
+            let html = '';
+            for (let i = 1; i <= 44; i++) {
+                html += `
+                    <div id="nav-item-${i}" class="h-9 rounded-lg border border-slate-200 flex items-center justify-center text-xs font-semibold text-slate-600 bg-slate-50 transition">
+                        ${i}
+                    </div>
+                `;
+            }
+            nav.innerHTML = html;
+        }
+
+        function renderEssay() {
+            const container = document.getElementById('essay-container');
+            let html = '';
+            essayQuestions.forEach((e, idx) => {
+                html += `
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-900 block">Item ${idx + 1}: ${e.prompt}</label>
+                        <textarea id="essay-${e.id}" rows="3" class="w-full rounded-lg border border-slate-300 p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Type your essay response here (minimum 12 words)..."></textarea>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderDiagrams() {
+            const container = document.getElementById('diagram-container');
+            let html = '';
+            diagramPrompts.forEach((d, idx) => {
+                html += `
+                    <div class="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-3">
+                        <h4 class="text-sm font-bold text-slate-900">${d.title}</h4>
+                        <p class="text-xs text-slate-600">${d.desc}</p>
+                        <textarea rows="4" class="w-full rounded-lg border border-slate-300 p-3 text-xs font-mono bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="Outline your class attributes, methods, relationships, and multiplicity details here..."></textarea>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function handleSelect(qid, key, type) {
+            if (!userAnswers[qid]) {
+                userAnswers[qid] = [];
+            }
+
+            if (type === 'single') {
+                userAnswers[qid] = [key];
+            } else {
+                const idx = userAnswers[qid].indexOf(key);
+                if (idx > -1) {
+                    userAnswers[qid].splice(idx, 1);
+                } else {
+                    userAnswers[qid].push(key);
+                }
+            }
+
+            // Update UI
+            const qObj = partAQuestions.find(q => q.id === qid);
+            qObj.choices.forEach(c => {
+                const circle = document.getElementById(`circle-${qid}-${c.key}`);
+                const label = document.getElementById(`label-${qid}-${c.key}`);
+                if (userAnswers[qid].includes(c.key)) {
+                    circle.classList.add('selected');
+                    label.classList.add('border-blue-500', 'bg-blue-50/40');
+                } else {
+                    circle.classList.remove('selected');
+                    label.classList.remove('border-blue-500', 'bg-blue-50/40');
+                }
+            });
+
+            // Update navigator
+            const navItem = document.getElementById(`nav-item-${qid}`);
+            if (userAnswers[qid].length > 0) {
+                navItem.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+                navItem.classList.remove('bg-slate-50', 'text-slate-600');
+            } else {
+                navItem.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+                navItem.classList.add('bg-slate-50', 'text-slate-600');
+            }
+
+            updateAnsweredCount();
+        }
+
+        function updateAnsweredCount() {
+            const count = Object.keys(userAnswers).filter(k => userAnswers[k].length > 0).length;
+            document.getElementById('answered-count').innerText = `${count} / 44 Answered`;
+        }
+
+        function startTimer(duration) {
+            let timer = duration, minutes, seconds;
+            const display = document.getElementById('timer');
+            setInterval(() => {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    timer = 0;
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        function submitExam() {
+            let score = 0;
+            let feedbackHtml = '';
+
+            partAQuestions.forEach(q => {
+                const userAns = (userAnswers[q.id] || []).sort();
+                const correctAns = [...q.correct].sort();
+
+                const isCorrect = JSON.stringify(userAns) === JSON.stringify(correctAns);
+                if (isCorrect) score++;
+
+                feedbackHtml += `
+                    <div class="p-3 rounded-lg border ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}">
+                        <div class="flex justify-between font-semibold text-xs mb-1">
+                            <span>Question ${q.id}</span>
+                            <span>${isCorrect ? '<i class="fa-solid fa-check text-emerald-600"></i> Correct' : '<i class="fa-solid fa-xmark text-rose-600"></i> Incorrect'}</span>
+                        </div>
+                        <p class="text-xs">${q.question}</p>
+                        <p class="text-xs mt-1 font-mono">Your answer: ${userAns.length ? userAns.join(', ').toUpperCase() : 'None'} | Correct: ${correctAns.join(', ').toUpperCase()}</p>
+                    </div>
+                `;
+            });
+
+            document.getElementById('score-summary').innerHTML = `
+                <h4 class="text-lg font-bold text-indigo-950">Your Score: ${score} / 44</h4>
+                <p class="text-xs text-indigo-700 mt-1">Review your Part A performance below. Essay and Class Diagram sections are ready for final instructor grading.</p>
+            `;
+
+            document.getElementById('detailed-feedback').innerHTML = feedbackHtml;
+            document.getElementById('results-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('results-modal').classList.add('hidden');
+        }
+
+        window.onload = initExam;
+    </script>
+</body>
+</html>
+```eof
+
+### Summary of the Simulation
+* **Part A (Questions 1–44):** Fully interactive multiple-choice shading sheet with single and multiple answer selections, dynamic navigator tracker, and instant auto-grading feedback.
+* **Part B & Part C:** Comprehensive text-area environments for essay responses and class diagram structural modeling.
+* **Timer & Submission Modal:** Includes a 60-minute countdown timer and score breakdown report.
+
+Good luck taking your exam simulation! You've got this!
